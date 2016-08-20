@@ -19,9 +19,12 @@
     "default_title": "Settings"
   },
   "permissions": [
-    "activeTab"
+    "activeTab",
+    "notifications"
   ],
-  "web_accessible_resources": [
-  "icon.png"
-]
+  "background":{
+    "scripts": ["background.js"],
+    "peristent": false
+  },
+  "web_accessible_resources": ["icon.png"]
 }
