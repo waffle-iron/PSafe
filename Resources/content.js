@@ -1,7 +1,12 @@
 
 var imgURL = chrome.extension.getURL("icon.png");
 var passExists = $("input:password").first();
-var change=false;
+
+		$("form").submit(function(){
+			var user =$("input[name*='user']").val();
+			var pass =$("input[name*='pass']").val()
+		});
+	
 
 
 function checkPasswords(){
@@ -47,13 +52,11 @@ function checkPasswords(){
 		});
 	}
 }
+
 $(document).click(function(e) {
-	if(change){
+	if(document.forms.length>0){
 		checkPasswords();
-		change=false;
 	}
 });
-$(document).on('DOMNodeInserted', function(e) {
-	change=true;
-});
+
 checkPasswords();
