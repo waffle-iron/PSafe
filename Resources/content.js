@@ -1,85 +1,69 @@
-
 var imgURL = chrome.extension.getURL("icon.png");
-var passExists = $("input:password").first();
+var passExists = null;
 
-		$("form").submit(function(){
-			var user =$("input[name*='user']").val();
-		
-
-	var pass =$("input[name*='pass']").val()
-		});
-	
-
-
-function checkPasswords(){
+/* Check for password fields in forms and add extension */
+function checkPasswords() {
 	passExists = $("input:password");
-	if(passExists.length){
-		console.log(passExists);
-	
-
-	var parentHeight = passExists.outerHeight();
+	if (passExists.length) {
+		var parentHeight = passExists.outerHeight();
 		var parentWidth = passExists.outerWidth();
 		var parentColor = "#ffffff";
-		console.log("password field detected");
-
-		
-
-passExists.css({"background":"url('"+imgURL+"') "+parentColor+" right center no-repeat","background-size":passExists.outerHeight()});
-		passExists.mousemove(function(e){
-			var x = 
-
-e.pageX - passExists.offset().left;
-	//		var y = e.pageY - passExists.offset().top;
-			if(x>parentWidth-parentHeight){
-				passExists.css
-
-("cursor","pointer");
-			}else if(passExists.css("cursor")=="pointer"){
-				passExists.css("cursor","");
+		passExists.css({
+			"background": "url('" + imgURL + "') " + parentColor + " right center no-repeat",
+			"background-size": passExists.outerHeight()
+		});
+		/*Password mouse move listener for cursor */
+		passExists.mousemove(function(e) {
+			var x = e.pageX - passExists.offset().left;
+			if (x > parentWidth - parentHeight) {
+				passExists.css("cursor", "pointer");
+			} else if (passExists.css("cursor") == "pointer") {
+				passExists.css("cursor", "");
 			}
 		});
-
-		
-
-passExists.click(function(e){
-			passExists.trigger('keyup');
+		/*Password button click listener */
+		passExists.click(function(e) {
 			var x = e.pageX - passExists.offset().left;
-//			var y = e.pageY - passExists.offset().top;
-	
-
-		if(x>parentWidth-parentHeight){
+			if (x > parentWidth - parentHeight) {
 				chrome.extension.sendMessage({
-					type: "initiate", 
+					type: "initiate",
 					data: {
-		
-
-				myProperty: "Hello"
+						myProperty: "Hello"
 					}
 				});
-
-			}	
-		});
-		
-
-chrome.extension.onMessage.addListener(function(msg, sender, sendResponse) {
-			passExists.focus()
-			passExists.val(msg.action);
-			passExists.keypress();
-	
-
-		passExists.change();
-			passExists.keydown();
-			passExists.keyup();
+			}
 		});
 	}
 }
-
-$(document).click(function(e) {
-	if(document.forms.length>0){
-	
-
-	checkPasswords();
+/*check page for form elements */
+function checkForm() {
+	if ($("form").length > 0) {
+		$("form").submit(function() {
+			var user = $("input[name*='user']").val();
+			var pass = $("input[name*='pass']").val();
+		});
+		return true;
 	}
+	return false;
+}
+/*check passwords if form exists */
+if (checkForm()) {
+	checkPasswords();
+}
+
+/* LISTENERS */
+
+chrome.extension.onMessage.addListener(function(msg, sender, sendResponse) {
+	passExists.focus()
+	passExists.val(msg.action);
+	passExists.keypress();
+	passExists.change();
+	passExists.keydown();
+	passExists.keyup();
 });
 
-checkPasswords();
+$(document).click(function(e) {
+	if (checkForm()) {
+		checkPasswords();
+	}
+});
