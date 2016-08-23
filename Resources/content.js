@@ -38,9 +38,11 @@ function checkPasswords() {
 /*check page for form elements */
 function checkForm() {
 	if ($("form").length > 0) {
+		/*Form submission listener */
 		$("form").submit(function() {
 			var user = $("input[name*='user']").val();
 			var pass = $("input[name*='pass']").val();
+			alert("Captured user="+user+" pass="+pass);
 		});
 		return true;
 	}
@@ -53,6 +55,9 @@ if (checkForm()) {
 
 /* LISTENERS */
 
+/* Background page listeners */
+
+/* Fill in password input field */
 chrome.extension.onMessage.addListener(function(msg, sender, sendResponse) {
 	passExists.focus()
 	passExists.val(msg.action);
