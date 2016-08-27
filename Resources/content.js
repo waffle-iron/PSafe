@@ -1,6 +1,17 @@
 var imgURL = chrome.extension.getURL("icon.png");
 var passExists = null;
 
+$.fn.uniqueId = function() {
+	var id = null;
+	if(!this.attr('id')){
+		id = "uid-"+(Math.floor(Math.random()*26)+jQuery.now());
+		this.attr('id', id);
+	}else{
+		id = this.attr('id');
+	}
+	return id;
+}
+
 /* Check for password fields in forms and add extension */
 function checkPasswords() {
 	passExists = $("input:password");
@@ -36,11 +47,14 @@ function checkPasswords() {
 function checkForm() {
 	if ($("form").length > 0) {
 		/*Form submission listener */
-		$("form").submit(function() {
-			var user = $("input[name*='user']").val();
-			var pass = $("input[name*='pass']").val();
-			alert("Captured user="+user+" pass="+pass);
+		$("form").each(function(){
+			$(this).uniqueId();
 		});
+			$("form").submit(function() {
+				var user = $("input[name*='user']").val();
+				var pass = $("input[name*='pass']").val();
+				alert("Captured user="+user+" pass="+pass);
+			});
 		return true;
 	}
 	return false;
