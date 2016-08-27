@@ -1,7 +1,9 @@
 var imgURL = chrome.extension.getURL("icon.png");
 var passExists = null;
 var formids = [];
+var passids = [];
 
+/*generate unique id for fields that dont have an id */
 $.fn.uniqueId = function() {
 	var id = null;
 	if(!this.attr('id')){
@@ -17,31 +19,38 @@ $.fn.uniqueId = function() {
 function checkPasswords() {
 	passExists = $("input:password");
 	if (passExists.length) {
-		var parentHeight = passExists.outerHeight();
-		var parentWidth = passExists.outerWidth();
-		var parentColor = "#ffffff";
-		passExists.css({
-			"background": "url('" + imgURL + "') " + parentColor + " right center no-repeat",
-			"background-size": passExists.outerHeight()
-		});
-		/*Password mouse move listener for cursor */
-		passExists.mousemove(function(e) {
-			var x = e.pageX - passExists.offset().left;
-			if (x > parentWidth - parentHeight) {
-				passExists.css("cursor", "pointer");
-			} else if (passExists.css("cursor") == "pointer") {
-				passExists.css("cursor", "");
-			}
-		});
-		/*Password button click listener */
-		passExists.click(function(e) {
-			var x = e.pageX - passExists.offset().left;
-			if (x > parentWidth - parentHeight) {
-				chrome.extension.sendMessage({
-					type: "logoPress"
+		passExists.each(function(){
+			var pHeight = $(this).outerHeight();
+			var pWidth = $(this).outerWidth();
+			var id = $(this).uniqueId();
+			//add in logo
+			$(this).css("background","url('" + imgURL + "') ");
+			$(this).css("background-position","right center");
+			$(this).css("background-repeat","no-repeat");
+			$(this).css("background-size",pHeight);
+
+			if($.inArray(id,passids)<0){
+				/*Password mouse move listener for cursor */
+				$(this).mousemove(function(e) {
+					var x = e.pageX - $(this).offset().left;
+					if (x > pWidth - pHeight) {
+						$(this).css("cursor", "pointer");
+					} else if ($(this).css("cursor") == "pointer") {
+						$(this).css("cursor", "");
+					}
+				});
+				/*Password button click listener */
+				$(this).click(function(e) {
+					var x = e.pageX - $(this).offset().left;
+					if (x > pWidth - pHeight) {
+						chrome.extension.sendMessage({
+							type: "logoPress"
+						});
+					}
 				});
 			}
 		});
+
 	}
 }
 /*check page for form elements */
