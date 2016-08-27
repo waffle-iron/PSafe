@@ -1,5 +1,6 @@
 var imgURL = chrome.extension.getURL("icon.png");
 var passExists = null;
+var formids = [];
 
 $.fn.uniqueId = function() {
 	var id = null;
@@ -48,13 +49,16 @@ function checkForm() {
 	if ($("form").length > 0) {
 		/*Form submission listener */
 		$("form").each(function(){
-			$(this).uniqueId();
+			var id = $(this).uniqueId();
+			if($.inArray(id,formids)<0){
+				formids.push(id);
+				$(this).submit(function() {
+					var user = $("input[name*='user']").val();
+					var pass = $("input[name*='pass']").val();
+					alert("Captured user="+user+" pass="+pass);
+				});
+			}
 		});
-			$("form").submit(function() {
-				var user = $("input[name*='user']").val();
-				var pass = $("input[name*='pass']").val();
-				alert("Captured user="+user+" pass="+pass);
-			});
 		return true;
 	}
 	return false;
