@@ -1,32 +1,17 @@
-var myNotificationID = null;
-var opt1 = {
-   type: "basic",
-   title: "PSafe",
-   message: "",
-   iconUrl: "icon.png",
-   eventTime: Date.now()+10000,
-   isClickable: false,
-   buttons: null
+
+//basic popup window
+var window1 = {
+	type: "basic",
+	title: "PSafe",
+	message: "",
+	iconUrl: "icon.png",
+	eventTime: Date.now()+10000,
+	isClickable: false,
+	buttons: null
 
 };
 
-chrome.extension.onMessage.addListener(function(request, sender, sendResponse) {
-    switch(request.type) {
-        case "initiate":
-        	opt1.message = "No password exists for this domain, would you like to generate a password?";
-        	opt1.buttons =    [{
-               title: "Yes, Generate password",
-           }];
-            chrome.notifications.create("popup", opt1, function(id) {
-            				   if(chrome.runtime.lastError) {
-            				     console.error(chrome.runtime.lastError.message);
-            				   }
-            				   myNotificationID=id;
-            });
-        break;
-    }
-    return true;
-});
+/*generate password */
 function generatePassword(){
 	var str = "";
 	var chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXTZabcdefghiklmnopqrstuvwxyz1234567890!@#$%^&*()_-+=.,[]{}`~";
@@ -37,20 +22,39 @@ function generatePassword(){
 	}
 	return str;
 }
-chrome.notifications.onButtonClicked.addListener(function(notifId, btnIdx) {
-    if (notifId === myNotificationID) {
-        if (btnIdx === 0) {
-        	var pass = generatePassword();
-        	opt1.message = "Password Generated:\n"+pass;
-        	opt1.buttons = null;
-            chrome.notifications.create("popup", opt1, function(id){
-            	if(chrome.runtime.lastError){
-            		console.error(chrome.runtime.lastError.message);
-            	}
-            	chrome.tabs.query({active: true, currentWindow: true}, function(tabs){
-            	    chrome.tabs.sendMessage(tabs[0].id, {action: pass}, function(response) {});  
-            	});
-            });
-        } 
-    }
+
+/* logopress message listener */
+chrome.extension.onMessage.addListener(function(request, sender, sendResponse) {
+	switch(request.type) {
+		case "logoPress":
+		window1.message = "No password exists for this domain, would you like to generate a password?";
+		window1.buttons =    [{
+			title: "Yes, Generate password",
+		}];
+		chrome.notifications.create("popup", window1, function(id) {
+			if(chrome.runtime.lastError) {
+				console.error(chrome.runtime.lastError.message);
+			}
+
+			/* Button press listener */
+			chrome.notifications.onButtonClicked.addListener(function(id, btnIdx) {
+				if (btnIdx === 0) {
+					var pass = generatePassword();
+					window1.message = "Password Generated:\n"+pass;
+					window1.buttons = null;
+					chrome.notifications.create("popup", window1, function(id){
+						if(chrome.runtime.lastError){
+							console.error(chrome.runtime.lastError.message);
+						}
+						chrome.tabs.query({active: true, currentWindow: true}, function(tabs){
+							chrome.tabs.sendMessage(tabs[0].id, {action: pass}, function(response) {});  
+						});
+					});
+				}
+
+			});
+		});
+		break;
+	}
+	return true;
 });

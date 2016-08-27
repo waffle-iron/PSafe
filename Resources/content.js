@@ -26,10 +26,7 @@ function checkPasswords() {
 			var x = e.pageX - passExists.offset().left;
 			if (x > parentWidth - parentHeight) {
 				chrome.extension.sendMessage({
-					type: "initiate",
-					data: {
-						myProperty: "Hello"
-					}
+					type: "logoPress"
 				});
 			}
 		});
