@@ -1,7 +1,7 @@
 var imgURL = chrome.extension.getURL("icon.png");
-var passExists = null;
 var formids = [];
 var passids = [];
+var passFields = new Array();
 
 /*generate unique id for fields that dont have an id */
 $.fn.uniqueId = function() {
@@ -17,31 +17,61 @@ $.fn.uniqueId = function() {
 
 /* Check for password fields in forms and add extension */
 function checkPasswords() {
-	passExists = $("input:password");
-	if (passExists.length) {
-		passExists.each(function(){
-			var pHeight = $(this).outerHeight();
-			var pWidth = $(this).outerWidth();
-			var id = $(this).uniqueId();
+	//find password related text inputs
+	$("input:password").each(function(){
+		var uid = $(this).uniqueId();
+		var data = passFields.find( function( field ) { 
+		    return field.key === uid;
+		} );
+		if(!data){
+			passFields.push({key:uid, value:$(this)});
+		}
+	});
+	$("input:text[name*='pass']").each(function(){
+		var uid = $(this).uniqueId();
+		var data = passFields.find( function( field ) { 
+		    return field.key === uid;
+		} );
+		if(!data){
+			passFields.push({key:uid, value:$(this)});
+		}
+	});
+	$("[id*='pass']").each(function(){
+		var uid = $(this).uniqueId();
+		var data = passFields.find( function( field ) { 
+		    return field.key === uid;
+		} );
+		if(!data){
+			if($(this).tagName== "INPUT"){
+				passFields.push({key:uid, value:$(this)});
+			}
+		}
+	});
+	if (passFields.length) {
+		$.each(passFields,function(key, value){
+			var field = value.value;
+			var pHeight = field.outerHeight();
+			var pWidth = field.outerWidth();
+			var id = field.uniqueId();
 			//add in logo
-			$(this).css("background","url('" + imgURL + "') ");
-			$(this).css("background-position","right center");
-			$(this).css("background-repeat","no-repeat");
-			$(this).css("background-size",pHeight);
+			field.css("background","url('" + imgURL + "') ");
+			field.css("background-position","right center");
+			field.css("background-repeat","no-repeat");
+			field.css("background-size",pHeight);
 
 			if($.inArray(id,passids)<0){
 				/*Password mouse move listener for cursor */
-				$(this).mousemove(function(e) {
-					var x = e.pageX - $(this).offset().left;
+				field.mousemove(function(e) {
+					var x = e.pageX - field.offset().left;
 					if (x > pWidth - pHeight) {
-						$(this).css("cursor", "pointer");
-					} else if ($(this).css("cursor") == "pointer") {
-						$(this).css("cursor", "");
+						field.css("cursor", "pointer");
+					} else if (field.css("cursor") == "pointer") {
+						field.css("cursor", "");
 					}
 				});
 				/*Password button click listener */
-				$(this).click(function(e) {
-					var x = e.pageX - $(this).offset().left;
+				field.click(function(e) {
+					var x = e.pageX - field.offset().left;
 					if (x > pWidth - pHeight) {
 						chrome.extension.sendMessage({
 							type: "logoPress"
@@ -50,7 +80,6 @@ function checkPasswords() {
 				});
 			}
 		});
-
 	}
 }
 /*check page for form elements */
@@ -73,10 +102,13 @@ function checkForm() {
 	return false;
 }
 /*check passwords if form exists */
-if (checkForm()) {
-	checkPasswords();
+function checks(){
+	if (checkForm()) {
+		checkPasswords();
+	}
 }
 
+checks();
 /* LISTENERS */
 
 /* Background page listeners */
@@ -94,9 +126,9 @@ chrome.extension.onMessage.addListener(function(msg, sender, sendResponse) {
 var observer = new MutationObserver(function(mutations) {
     mutations.forEach(function(mutation) {
         if (typeof mutation.addedNodes == "object") {
-        	var jq = $(mutation.addedNodes).find("input:password");
+        	var jq = $(mutation.addedNodes).find("input");
         	if(jq.length > 0){
-        		checkForm();
+        		checks();
         	}
         }
     });
