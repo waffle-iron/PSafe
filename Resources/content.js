@@ -91,8 +91,18 @@ chrome.extension.onMessage.addListener(function(msg, sender, sendResponse) {
 	passExists.keyup();
 });
 
-$(document).click(function(e) {
-	if (checkForm()) {
-		checkPasswords();
-	}
+var observer = new MutationObserver(function(mutations) {
+    mutations.forEach(function(mutation) {
+        if (typeof mutation.addedNodes == "object") {
+        	var jq = $(mutation.addedNodes).find("input:password");
+        	if(jq.length > 0){
+        		checkForm();
+        	}
+        }
+    });
 });
+var config = {
+    "childList": true, 
+    "subtree": true
+};
+observer.observe(document.body, config);
