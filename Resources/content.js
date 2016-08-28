@@ -115,12 +115,15 @@ checks();
 
 /* Fill in password input field */
 chrome.extension.onMessage.addListener(function(msg, sender, sendResponse) {
-	passExists.focus()
-	passExists.val(msg.action);
-	passExists.keypress();
-	passExists.change();
-	passExists.keydown();
-	passExists.keyup();
+	$.each(passFields,function(key, value){
+			var field = value.value;
+			field.focus()
+			field.val(msg.action);
+			field.keypress();
+			field.change();
+			field.keydown();
+			field.keyup();
+		});
 });
 
 var observer = new MutationObserver(function(mutations) {
