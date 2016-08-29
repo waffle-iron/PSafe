@@ -94,6 +94,7 @@ function checkForm() {
 				formids.push(id);
 				$(this).submit(function() {
 					var user = $("input[name*='user']").val();
+					var email = $("input[name*='email']").val();
 					var pass = $("input[name*='pass']").val();
 					alert("Captured user="+user+" pass="+pass);
 				});
