@@ -53,11 +53,13 @@ function checkPasswords() {
 			var pHeight = field.outerHeight();
 			var pWidth = field.outerWidth();
 			var id = field.uniqueId();
+			var pColor = field.css("background-color");
 			//add in logo
 			field.css("background","url('" + imgURL + "') ");
 			field.css("background-position","right center");
 			field.css("background-repeat","no-repeat");
 			field.css("background-size",pHeight);
+			field.css("background-color",pColor);
 
 			if($.inArray(id,passids)<0){
 				/*Password mouse move listener for cursor */
