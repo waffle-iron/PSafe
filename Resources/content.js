@@ -96,7 +96,9 @@ function checkForm() {
 					var user = $("input[name*='user']").val();
 					var email = $("input[name*='email']").val();
 					var pass = $("input[name*='pass']").val();
-					alert("Captured user="+user+" pass="+pass);
+					if((user||email) && pass){
+						alert("Captured user="+user+" pass="+pass);
+					}
 				});
 			}
 		});
